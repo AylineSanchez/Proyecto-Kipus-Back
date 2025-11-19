@@ -22,7 +22,10 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'https://proyecto-kipus-back-1.onrender.com'
+    ],
   credentials: true
 }));
 app.use(express.json());
