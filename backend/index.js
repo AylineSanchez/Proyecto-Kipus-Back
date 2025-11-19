@@ -1,9 +1,14 @@
 // backend/index.js - AGREGAR ESTAS LÍNEAS
 const express = require('express');
 const cors = require('cors');
-const pool = require('./config/database');
+const(Pool) = require("pg");
 require('dotenv').config();
-
+const pool = new Pool((
+  connectionString: process.env.DATABASE_URL,
+  ssl:{
+    rejectUnauthorized: false
+  }
+));
 // Importar rutas
 const authRoutes = require('./routes/auth');
 const ubicacionRoutes = require('./routes/ubicacion');
