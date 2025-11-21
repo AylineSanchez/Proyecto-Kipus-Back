@@ -10,31 +10,27 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 // Configuración DIRECTA de Gmail (más simple)
-// CONFIGURACIÓN SMTP MEJORADA PARA RENDER
-const createTransport = () => {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    // Optimizado para entornos cloud
-    pool: true,
-    maxConnections: 3,
-    maxMessages: 10,
-    rateDelta: 2000,
-    rateLimit: 3,
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 15000,
-    // Para evitar problemas de TLS
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
-};
-
-const transporter = createTransport();
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  // Configuración agresiva para timeout
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
+  // Forzar TLS
+  requireTLS: true,
+  tls: {
+    rejectUnauthorized: false
+  },
+  // Configuración de red específica
+  localAddress: undefined,
+  family: undefined
+});
 
 // Función mejorada de verificación
 const verificarConexionSMTP = async () => {
