@@ -12,15 +12,16 @@ const nodemailer = require('nodemailer');
 // Configuración DIRECTA de Gmail (más simple)
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false, // true para 465, false para otros puertos
+  port: 465, // ← CAMBIAR a 465
+  secure: true, // ← true para puerto 465
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  tls: {
-    rejectUnauthorized: false // Para evitar problemas de certificado
-  }
+  // Configuración adicional para Render
+  connectionTimeout: 10000, // 10 segundos
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 // Función mejorada para verificar SMTP
