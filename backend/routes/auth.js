@@ -10,22 +10,42 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 // Configuración DIRECTA de Gmail (más simple)
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
+const transporter = nodemailer.createTransporter({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT || 587,
+  secure: false, // true para 465, false para otros puertos
   auth: {
-    user: process.env.SMTP_USER,  // Tu email de Gmail
-    pass: process.env.SMTP_PASS   // La contraseña de aplicación: mwnk ryet ouox dsxl
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false // Para evitar problemas de certificado
   }
 });
 
-// Función para verificar la conexión SMTP
+// Función mejorada para verificar SMTP
 const verificarConexionSMTP = async () => {
   try {
     await transporter.verify();
     console.log('✅ Conexión SMTP con Gmail establecida correctamente');
+    
+    // Verificar que las variables estén cargadas
+    console.log('📧 Configuración SMTP:', {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      user: process.env.SMTP_USER ? '✅ Configurado' : '❌ Faltante',
+      pass: process.env.SMTP_PASS ? '✅ Configurado' : '❌ Faltante'
+    });
+    
     return true;
   } catch (error) {
     console.error('❌ Error en conexión SMTP:', error.message);
+    console.log('🔧 Variables de entorno SMTP:', {
+      SMTP_HOST: process.env.SMTP_HOST,
+      SMTP_PORT: process.env.SMTP_PORT,
+      SMTP_USER: process.env.SMTP_USER ? 'Presente' : 'Ausente',
+      SMTP_PASS: process.env.SMTP_PASS ? 'Presente' : 'Ausente'
+    });
     return false;
   }
 };
