@@ -10,47 +10,51 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 // Configuración DIRECTA de Gmail (más simple)
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: 465, // ← CAMBIAR a 465
-  secure: true, // ← true para puerto 465
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  // Configuración adicional para Render
-  connectionTimeout: 10000, // 10 segundos
-  greetingTimeout: 10000,
-  socketTimeout: 10000
-});
+// CONFIGURACIÓN SMTP MEJORADA PARA RENDER
+const createTransport = () => {
+  return nodemailer.createTransporter({
+    service: 'gmail',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    // Optimizado para entornos cloud
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 10,
+    rateDelta: 2000,
+    rateLimit: 3,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 15000,
+    // Para evitar problemas de TLS
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+};
 
-// Función mejorada para verificar SMTP
+const transporter = createTransport();
+
+// Función mejorada de verificación
 const verificarConexionSMTP = async () => {
   try {
+    console.log('🔧 Verificando configuración SMTP...');
+    console.log('📧 Usuario:', process.env.SMTP_USER);
+    console.log('🔑 Contraseña:', process.env.SMTP_PASS ? '✅ Presente' : '❌ Ausente');
+    
     await transporter.verify();
     console.log('✅ Conexión SMTP con Gmail establecida correctamente');
-    
-    // Verificar que las variables estén cargadas
-    console.log('📧 Configuración SMTP:', {
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      user: process.env.SMTP_USER ? '✅ Configurado' : '❌ Faltante',
-      pass: process.env.SMTP_PASS ? '✅ Configurado' : '❌ Faltante'
-    });
-    
     return true;
   } catch (error) {
     console.error('❌ Error en conexión SMTP:', error.message);
-    console.log('🔧 Variables de entorno SMTP:', {
-      SMTP_HOST: process.env.SMTP_HOST,
-      SMTP_PORT: process.env.SMTP_PORT,
-      SMTP_USER: process.env.SMTP_USER ? 'Presente' : 'Ausente',
-      SMTP_PASS: process.env.SMTP_PASS ? 'Presente' : 'Ausente'
+    console.error('🔧 Detalles del error:', {
+      code: error.code,
+      command: error.command
     });
     return false;
   }
 };
-
 // Llamar la verificación al iniciar (opcional)
 verificarConexionSMTP();
 
