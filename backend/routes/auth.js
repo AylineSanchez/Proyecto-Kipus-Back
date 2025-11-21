@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
 // Configuración DIRECTA de Gmail (más simple)
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: process.env.SMTP_PORT || 587,
   secure: false, // true para 465, false para otros puertos
