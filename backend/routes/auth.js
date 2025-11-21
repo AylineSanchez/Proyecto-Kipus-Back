@@ -12,7 +12,7 @@ const nodemailer = require('nodemailer');
 // Configuración DIRECTA de Gmail (más simple)
 // CONFIGURACIÓN SMTP MEJORADA PARA RENDER
 const createTransport = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.SMTP_USER,
